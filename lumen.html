@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lumen — Stream Without Limits</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#05060a; --bg2:#0b0e17; --navy:#0e1424;
+  --glass:rgba(255,255,255,.05); --glass-brd:rgba(255,255,255,.10); --glass-hi:rgba(255,255,255,.09);
+  --violet:#7c6cff; --blue:#43d9ff; --grad:linear-gradient(120deg,#7c6cff,#43d9ff);
+  --text:#eef0f8; --muted:#8b93ab; --muted2:#5c6480;
+  --r:18px; --r-sm:12px;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-padding-top:env(safe-area-inset-top,0px); scroll-behavior:smooth}
+body{
+  font-family:'Inter',sans-serif; background:var(--bg); color:var(--text);
+  min-height:100vh; overflow-x:hidden;
+}
+::-webkit-scrollbar{height:8px;width:0}
+::-webkit-scrollbar-thumb{background:#2a2f42;border-radius:8px}
+h1,h2,h3,.brand{font-family:'Space Grotesk',sans-serif}
+.glass{
+  background:var(--glass); backdrop-filter:blur(22px) saturate(140%);
+  -webkit-backdrop-filter:blur(22px) saturate(140%);
+  border:1px solid var(--glass-brd); border-radius:var(--r);
+}
+button{font-family:inherit;cursor:pointer;border:none}
+.btn{padding:13px 26px;border-radius:999px;font-weight:600;font-size:.92rem;display:inline-flex;align-items:center;gap:8px;transition:transform .25s ease, box-shadow .25s ease}
+.btn-primary{background:var(--grad);color:#06070c}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 30px -8px rgba(124,108,255,.55)}
+.btn-glass{background:var(--glass);color:var(--text);border:1px solid var(--glass-brd)}
+.btn-glass:hover{background:rgba(255,255,255,.09);transform:translateY(-2px)}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--glass-brd)}
+input,select{font-family:inherit}
+
+/* background ambience */
+.ambient{position:fixed;inset:0;z-index:0;pointer-events:none;background:
+  radial-gradient(60% 45% at 15% 10%, rgba(124,108,255,.16), transparent 60%),
+  radial-gradient(50% 40% at 90% 20%, rgba(67,217,255,.12), transparent 60%),
+  radial-gradient(70% 50% at 50% 100%, rgba(30,20,60,.5), transparent 60%),
+  var(--bg);}
+
+/* ===== NAV ===== */
+.nav{position:sticky;top:12px;z-index:50;margin:12px 16px 0;display:flex;align-items:center;justify-content:space-between;padding:12px 20px;}
+.brand{font-weight:700;font-size:1.25rem;letter-spacing:.5px;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.nav-links{display:flex;gap:6px;list-style:none}
+.nav-links button{padding:9px 16px;border-radius:999px;background:transparent;color:var(--muted);font-size:.9rem;font-weight:500;transition:.2s}
+.nav-links button.active,.nav-links button:hover{background:var(--glass-hi);color:var(--text)}
+.nav-right{display:flex;align-items:center;gap:10px}
+.icon-btn{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--glass);border:1px solid var(--glass-brd);color:var(--muted);transition:.2s}
+.icon-btn:hover{color:var(--text);background:var(--glass-hi)}
+.avatar{width:38px;height:38px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-weight:700;color:#06070c;font-size:.85rem}
+.bottom-nav{display:none}
+
+/* ===== MOBILE NAV ===== */
+@media(max-width:760px){
+  .nav-links{display:none}
+  .bottom-nav{display:flex;position:fixed;bottom:14px;left:12px;right:12px;z-index:50;justify-content:space-around;padding:10px 6px;}
+  .bottom-nav button{background:transparent;color:var(--muted2);display:flex;flex-direction:column;align-items:center;gap:3px;font-size:.62rem;font-weight:500}
+  .bottom-nav button.active{color:var(--blue)}
+  main{padding-bottom:90px !important}
+}
+
+main{position:relative;z-index:1;max-width:1400px;margin:0 auto;padding:20px 24px 60px}
+.view{display:none;animation:fade .5s ease}
+.view.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ===== ONBOARDING ===== */
+#view-onboard.active{display:flex;min-height:calc(100vh - 40px);align-items:center;justify-content:center;padding:0}
+.onboard-card{width:min(440px,92vw);padding:48px 40px;text-align:center;animation:rise .7s cubic-bezier(.2,.8,.2,1)}
+@keyframes rise{from{opacity:0;transform:translateY(30px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+.onboard-logo{font-size:2rem;font-weight:700;margin-bottom:34px}
+.onboard-card h1{font-size:1.9rem;font-weight:600;margin-bottom:10px}
+.onboard-card p{color:var(--muted);margin-bottom:30px;font-size:.95rem}
+.field{width:100%;padding:15px 18px;border-radius:var(--r-sm);background:rgba(255,255,255,.04);border:1px solid var(--glass-brd);color:var(--text);font-size:1rem;margin-bottom:22px;outline:none;transition:.25s}
+.field:focus{border-color:var(--violet);background:rgba(255,255,255,.07)}
+.field::placeholder{color:var(--muted2)}
+#view-onboard .btn-primary{width:100%;justify-content:center;padding:15px}
+
+/* ===== HERO ===== */
+.hero{position:relative;border-radius:26px;overflow:hidden;min-height:64vh;display:flex;align-items:flex-end;padding:48px;margin-bottom:38px;isolation:isolate}
+.hero-bg{position:absolute;inset:0;z-index:-1;background:
+  radial-gradient(120% 90% at 80% 0%, rgba(124,108,255,.35), transparent 55%),
+  radial-gradient(100% 80% at 10% 100%, rgba(67,217,255,.25), transparent 55%),
+  linear-gradient(180deg, #131a2e 0%, #0a0d17 100%)}
+.hero-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg, rgba(5,6,10,.95) 5%, rgba(5,6,10,.3) 55%, rgba(5,6,10,.55));}
+.hero-meta{display:flex;gap:10px;align-items:center;color:var(--muted);font-size:.85rem;margin-bottom:14px;flex-wrap:wrap}
+.pill{padding:4px 11px;border-radius:999px;background:var(--glass);border:1px solid var(--glass-brd);font-size:.75rem}
+.hero h1{font-size:clamp(2rem,5vw,3.4rem);font-weight:700;max-width:640px;line-height:1.05;margin-bottom:14px}
+.hero p{max-width:560px;color:var(--muted);margin-bottom:26px;line-height:1.55}
+.hero-actions{display:flex;gap:14px;flex-wrap:wrap}
+
+/* ===== ROWS / CARDS ===== */
+.row{margin-bottom:38px}
+.row-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px}
+.row-head h2{font-size:1.2rem;font-weight:600}
+.row-head span{color:var(--muted2);font-size:.82rem}
+.row-track{display:flex;gap:16px;overflow-x:auto;padding-bottom:10px;scroll-snap-type:x proximity}
+.card{flex:0 0 190px;scroll-snap-align:start;cursor:pointer;transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+.card:hover{transform:translateY(-6px) scale(1.035);z-index:2}
+.poster{position:relative;aspect-ratio:2/3;border-radius:14px;overflow:hidden;border:1px solid var(--glass-brd);display:flex;align-items:flex-end;padding:12px;box-shadow:0 10px 24px -10px rgba(0,0,0,.6)}
+.poster::before{content:'';position:absolute;inset:0;opacity:.9}
+.poster::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,.75));}
+.poster .rating{position:absolute;top:10px;right:10px;z-index:2;font-size:.68rem;font-weight:700;background:rgba(5,6,10,.55);padding:3px 8px;border-radius:999px;backdrop-filter:blur(6px)}
+.poster .glow{position:absolute;inset:0;opacity:0;transition:opacity .3s;background:linear-gradient(0deg,rgba(124,108,255,.35),transparent 60%);z-index:1}
+.card:hover .glow{opacity:1}
+.poster h4{position:relative;z-index:2;font-size:.85rem;font-weight:600;line-height:1.25}
+.card-info{margin-top:9px;font-size:.75rem;color:var(--muted2);display:flex;gap:6px;flex-wrap:wrap}
+
+/* ===== GRID (movies/series/search) ===== */
+.filters-bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:26px;align-items:center}
+.filters-bar select{padding:10px 14px;border-radius:999px;background:var(--glass);border:1px solid var(--glass-brd);color:var(--text);font-size:.82rem}
+.search-hero{margin:10px 0 30px;padding:22px 26px;display:flex;align-items:center;gap:12px}
+.search-hero input{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-size:1.05rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:18px}
+.empty{text-align:center;padding:70px 20px;color:var(--muted)}
+
+/* ===== SECTION HEADINGS ===== */
+.page-head{margin-bottom:30px}
+.page-head h1{font-size:2rem;font-weight:700;margin-bottom:8px}
+.page-head p{color:var(--muted)}
+
+/* ===== DETAILS ===== */
+#view-details .backdrop{position:relative;border-radius:26px;overflow:hidden;min-height:56vh;display:flex;align-items:flex-end;padding:40px;margin-bottom:30px}
+.details-grid{display:grid;grid-template-columns:220px 1fr;gap:34px;position:relative}
+.details-poster{aspect-ratio:2/3;border-radius:16px;border:1px solid var(--glass-brd)}
+.details-cast{color:var(--muted);font-size:.88rem;margin:10px 0}
+.details-actions{display:flex;gap:12px;flex-wrap:wrap;margin:20px 0}
+.ep-list{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.ep-item{padding:16px;display:flex;justify-content:space-between;align-items:center;gap:14px}
+.ep-item .n{color:var(--muted2);font-size:.8rem}
+.season-select{padding:9px 14px;border-radius:999px;background:var(--glass);border:1px solid var(--glass-brd);color:var(--text);margin:16px 0 4px}
+
+/* ===== LIVE TV ===== */
+.live-featured{position:relative;border-radius:22px;overflow:hidden;padding:34px;min-height:280px;display:flex;flex-direction:column;justify-content:flex-end;margin-bottom:30px}
+.live-tag{display:inline-flex;align-items:center;gap:6px;background:#e5304a;color:#fff;font-size:.72rem;font-weight:700;padding:4px 10px;border-radius:999px;width:fit-content;margin-bottom:12px}
+.live-tag .dot{width:7px;height:7px;border-radius:50%;background:#fff;animation:pulse 1.6s infinite}
+@keyframes pulse{50%{opacity:.3}}
+.channel-row{display:flex;gap:14px;overflow-x:auto;padding-bottom:8px;margin-bottom:30px}
+.chan-card{flex:0 0 150px;padding:16px;text-align:center;transition:.25s}
+.chan-card:hover{transform:translateY(-4px);background:var(--glass-hi)}
+.chan-logo{width:48px;height:48px;border-radius:12px;background:var(--grad);margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-weight:700;color:#06070c}
+.epg{display:flex;flex-direction:column;gap:10px}
+.epg-item{display:flex;justify-content:space-between;align-items:center;padding:16px 20px}
+.epg-item .time{color:var(--blue);font-size:.8rem;font-weight:600;width:90px}
+
+/* ===== PROFILE ===== */
+.profile-head{display:flex;gap:22px;align-items:center;padding:30px;margin-bottom:30px;flex-wrap:wrap}
+.big-avatar{width:84px;height:84px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:700;color:#06070c}
+.settings-list{display:flex;flex-direction:column;gap:2px}
+.settings-item{display:flex;justify-content:space-between;align-items:center;padding:18px 22px;border-bottom:1px solid var(--glass-brd)}
+.settings-item:last-child{border-bottom:none}
+.settings-item span:first-child{color:var(--muted)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+@media(max-width:700px){.two-col{grid-template-columns:1fr}.details-grid{grid-template-columns:1fr}.details-poster{width:140px}}
+
+/* ===== PLAYER ===== */
+.player-wrap{background:#000;border-radius:22px;overflow:hidden;position:relative;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+.player-wrap .center-art{position:absolute;inset:0;background:radial-gradient(60% 60% at 50% 40%,rgba(124,108,255,.25),transparent 70%),linear-gradient(160deg,#141a2c,#05060a)}
+.play-big{width:76px;height:76px;border-radius:50%;background:rgba(255,255,255,.12);backdrop-filter:blur(10px);border:1px solid var(--glass-brd);display:flex;align-items:center;justify-content:center;font-size:1.6rem;z-index:2}
+.controls{position:absolute;left:0;right:0;bottom:0;padding:18px 22px;background:linear-gradient(0deg,rgba(0,0,0,.75),transparent);z-index:3}
+.progress{height:4px;border-radius:2px;background:rgba(255,255,255,.18);margin-bottom:14px;position:relative;cursor:pointer}
+.progress .fill{position:absolute;left:0;top:0;bottom:0;width:38%;border-radius:2px;background:var(--grad)}
+.ctrl-row{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.ctrl-group{display:flex;align-items:center;gap:14px;color:var(--text)}
+.ctrl-group button{background:transparent;color:var(--text);font-size:1.05rem;opacity:.85}
+.ctrl-group button:hover{opacity:1}
+.time-txt{font-size:.78rem;color:var(--muted)}
+.up-next{display:flex;gap:16px;align-items:center;padding:16px 20px;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="ambient"></div>
+
+<nav class="nav glass" id="mainNav" style="display:none">
+  <div class="brand">LUMEN</div>
+  <ul class="nav-links">
+    <li><button data-view="home" class="active">Home</button></li>
+    <li><button data-view="movies">Movies</button></li>
+    <li><button data-view="series">Series</button></li>
+    <li><button data-view="live">Live TV</button></li>
+  </ul>
+  <div class="nav-right">
+    <button class="icon-btn" data-view="search" title="Search">&#128269;</button>
+    <button class="icon-btn" title="Notifications">&#128276;</button>
+    <button class="avatar" data-view="profile" title="Profile">A</button>
+  </div>
+</nav>
+
+<main>
+  <!-- ONBOARDING -->
+  <section class="view active" id="view-onboard">
+    <div class="onboard-card glass">
+      <div class="onboard-logo brand">LUMEN</div>
+      <h1>Welcome.</h1>
+      <p>What should we call you?</p>
+      <input class="field" id="nameInput" placeholder="Enter your name" maxlength="20">
+      <button class="btn btn-primary" id="continueBtn" style="width:100%;justify-content:center">Continue</button>
+    </div>
+  </section>
+
+  <!-- HOME -->
+  <section class="view" id="view-home">
+    <div class="hero">
+      <div class="hero-bg"></div>
+      <div>
+        <div class="hero-meta"><span class="pill">Featured</span><span>2026</span><span>&#9733; 8.9</span><span>Sci‑Fi · Thriller</span></div>
+        <h1>Nightfall Horizon</h1>
+        <p>When a signal from beyond the solar system starts rewriting memories on Earth, a decommissioned pilot must decide whether to trust what she remembers — or what she's told to.</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary" onclick="openDetails('Nightfall Horizon')">&#9654; Watch Now</button>
+          <button class="btn btn-glass" onclick="openDetails('Nightfall Horizon')">More Info</button>
+        </div>
+      </div>
+    </div>
+    <div id="homeRows"></div>
+  </section>
+
+  <!-- MOVIES -->
+  <section class="view" id="view-movies">
+    <div class="page-head"><h1>Movies</h1><p>Feature films across every genre, curated for you.</p></div>
+    <div class="filters-bar">
+      <select><option>All Genres</option><option>Sci‑Fi</option><option>Drama</option><option>Action</option><option>Comedy</option></select>
+      <select><option>Any Year</option><option>2026</option><option>2025</option><option>2024</option></select>
+    </div>
+    <div id="moviesRows"></div>
+  </section>
+
+  <!-- SERIES -->
+  <section class="view" id="view-series">
+    <div class="page-head"><h1>Series</h1><p>Bingeable stories, one episode at a time.</p></div>
+    <div class="filters-bar">
+      <select><option>All Genres</option><option>Drama</option><option>Crime</option><option>Fantasy</option></select>
+    </div>
+    <div id="seriesRows"></div>
+  </section>
+
+  <!-- SEARCH -->
+  <section class="view" id="view-search">
+    <div class="page-head"><h1>Search</h1></div>
+    <div class="search-hero glass">
+      <span>&#128269;</span>
+      <input id="searchInput" placeholder="Search movies, series, genres...">
+    </div>
+    <div class="filters-bar">
+      <select><option>All Types</option><option>Movies</option><option>Series</option></select>
+      <select><option>Any Genre</option><option>Sci‑Fi</option><option>Drama</option><option>Crime</option><option>Action</option></select>
+      <select><option>Sort: Relevance</option><option>Sort: Rating</option><option>Sort: Newest</option></select>
+    </div>
+    <div class="grid" id="searchGrid"></div>
+    <div class="empty" id="searchEmpty" style="display:none">No titles match your search. Try a different keyword.</div>
+  </section>
+
+  <!-- LIVE TV -->
+  <section class="view" id="view-live">
+    <div class="page-head"><h1>Live TV</h1><p>Tune in to what's playing right now.</p></div>
+    <div class="live-featured">
+      <div class="hero-bg"></div>
+      <span class="live-tag"><span class="dot"></span> LIVE</span>
+      <h2 style="font-size:1.6rem;margin-bottom:6px">Horizon News — The 9 O'Clock Edition</h2>
+      <p style="color:var(--muted);margin-bottom:18px">Coverage continues on the orbital summit talks.</p>
+      <button class="btn btn-primary" style="width:fit-content">&#9654; Watch Live</button>
+    </div>
+    <div class="row-head"><h2>Channels</h2></div>
+    <div class="channel-row" id="channelRow"></div>
+    <div class="row-head"><h2>Program Schedule</h2></div>
+    <div class="epg glass" style="padding:8px" id="epgList"></div>
+  </section>
+
+  <!-- PROFILE -->
+  <section class="view" id="view-profile">
+    <div class="profile-head glass">
+      <div class="big-avatar" id="bigAvatar">A</div>
+      <div style="flex:1;min-width:200px">
+        <h2 id="profileName" style="font-size:1.4rem;margin-bottom:4px">Guest</h2>
+        <p style="color:var(--muted);font-size:.85rem">Lumen Premium · Member since 2026</p>
+      </div>
+      <button class="btn btn-glass">Edit Profile</button>
+    </div>
+    <div class="row-head"><h2>Continue Watching</h2></div>
+    <div class="row-track" id="profileContinue"></div>
+    <div class="two-col" style="margin-top:20px">
+      <div>
+        <div class="row-head"><h2>Watchlist</h2></div>
+        <div class="row-track" id="profileWatchlist"></div>
+      </div>
+      <div>
+        <div class="row-head"><h2>Favorites</h2></div>
+        <div class="row-track" id="profileFav"></div>
+      </div>
+    </div>
+    <div class="row-head" style="margin-top:30px"><h2>Account Settings</h2></div>
+    <div class="settings-list glass">
+      <div class="settings-item"><span>Language</span><select style="background:transparent;color:var(--text);border:none"><option>English</option><option>Français</option><option>العربية</option></select></div>
+      <div class="settings-item"><span>Playback quality</span><span>Auto (4K)</span></div>
+      <div class="settings-item"><span>Notifications</span><span>On</span></div>
+      <div class="settings-item"><span></span><button class="btn btn-ghost">Log Out</button></div>
+    </div>
+  </section>
+
+  <!-- DETAILS -->
+  <section class="view" id="view-details">
+    <div class="backdrop"><div class="hero-bg"></div></div>
+    <div class="details-grid">
+      <div class="details-poster poster" id="detailsPoster"><div class="glow"></div></div>
+      <div>
+        <h1 id="detailsTitle" style="font-size:2rem;margin-bottom:10px">Title</h1>
+        <div class="hero-meta" id="detailsMeta"></div>
+        <p id="detailsDesc" style="color:var(--muted);max-width:640px;line-height:1.6;margin:14px 0"></p>
+        <div class="details-cast"><b style="color:var(--text)">Cast:</b> <span id="detailsCast"></span></div>
+        <div class="details-cast" style="margin-top:-6px"><b style="color:var(--text)">Director:</b> <span id="detailsDirector"></span></div>
+        <div class="details-actions">
+          <button class="btn btn-primary" onclick="showView('player')">&#9654; Play Now</button>
+          <button class="btn btn-glass">+ Watchlist</button>
+          <button class="btn btn-glass">Trailer</button>
+          <button class="btn btn-ghost">Share</button>
+        </div>
+        <div id="seasonBlock" style="display:none">
+          <select class="season-select"><option>Season 1</option><option>Season 2</option></select>
+          <div class="ep-list" id="epList"></div>
+        </div>
+      </div>
+    </div>
+    <div class="row-head" style="margin-top:36px"><h2>Related Titles</h2></div>
+    <div class="row-track" id="relatedRow"></div>
+  </section>
+
+  <!-- PLAYER -->
+  <section class="view" id="view-player">
+    <div class="player-wrap">
+      <div class="center-art"></div>
+      <div class="play-big">&#9654;</div>
+      <div class="controls">
+        <div class="progress"><div class="fill"></div></div>
+        <div class="ctrl-row">
+          <div class="ctrl-group">
+            <button>&#9654;</button><button>&#9193;</button>
+            <span class="time-txt">42:11 / 1:48:30</span>
+          </div>
+          <div class="ctrl-group">
+            <button title="Subtitles">CC</button>
+            <button title="Audio">&#127911;</button>
+            <button title="Speed">1x</button>
+            <button title="Quality">4K</button>
+            <button title="PiP">&#8862;</button>
+            <button title="Fullscreen">&#9974;</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:10px">
+      <div>
+        <h2 id="playerTitle" style="font-size:1.3rem">Nightfall Horizon</h2>
+        <p style="color:var(--muted);font-size:.85rem">S1 · E4 — Signal Loss</p>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-glass">Skip Intro</button>
+        <button class="btn btn-primary">Next Episode &#8250;</button>
+      </div>
+    </div>
+    <div class="row-head"><h2>Up Next</h2></div>
+    <div class="up-next glass"><div class="poster" style="width:90px;flex:none" id="upNextPoster"></div><div><b>Episode 5 — Deep Field</b><p style="color:var(--muted);font-size:.85rem;margin-top:4px">The crew loses contact with mission control.</p></div></div>
+  </section>
+</main>
+
+<nav class="bottom-nav glass" id="bottomNav" style="display:none">
+  <button data-view="home" class="active">&#8962;<span>Home</span></button>
+  <button data-view="search">&#128269;<span>Search</span></button>
+  <button data-view="live">&#128225;<span>Live</span></button>
+  <button data-view="movies">&#127909;<span>Movies</span></button>
+  <button data-view="profile">&#128100;<span>Profile</span></button>
+</nav>
+
+<script>
+// ---------- Data ----------
+const genArt = i => `linear-gradient(${140+i*23}deg, hsl(${(i*47)%360} 70% 22%), hsl(${(i*47+60)%360} 65% 14%))`;
+const titles = {
+  movies: ["Nightfall Horizon","Glass Republic","Ashen Roads","Velvet Circuit","The Last Ember","Static Bloom","Crimson Ferry","Hollow Orbit","Paper Tigers","Signal Fire","Marble Sky","Wolf Hour"],
+  series: ["Obsidian Line","The Quiet Wire","Faultless","North of Nowhere","Echo District","Iron Season","Half Light","Drift Kings"]
+};
+function makeItems(list,type){
+  return list.map((t,i)=>({
+    title:t, type, year:2022+((i*3)%5), rating:(7+((i*13)%29)/10).toFixed(1),
+    genre:["Sci‑Fi","Drama","Thriller","Crime","Action","Fantasy"][i%6],
+    runtime: type==='movie' ? `${1+((i%2))}h ${10+i*5%50}m` : `${3+(i%5)} Seasons`,
+    art:i, desc:"A gripping story of ambition, memory and consequence, set against a world that never stops moving. Every choice echoes further than expected.",
+    cast:["Mira Voss","Idris Kane","Tamsin Reyes","Owen Blackwood"].slice(0,3).join(", "),
+    director:["A. Solheim","N. Okafor","J. Marchetti"][i%3]
+  }));
+}
+const MOVIES = makeItems(titles.movies,'movie');
+const SERIES = makeItems(titles.series,'series');
+const ALL = MOVIES.concat(SERIES);
+
+function posterHTML(item,idx){
+  return `<div class="poster" style="background:${genArt(item.art!==undefined?item.art:idx)}"><div class="glow"></div>
+    <span class="rating">&#9733; ${item.rating}</span><h4>${item.title}</h4></div>`;
+}
+function card(item,idx){
+  return `<div class="card" onclick="openDetails('${item.title.replace(/'/g,"")}')">
+    ${posterHTML(item,idx)}
+    <div class="card-info"><span>${item.year}</span><span>·</span><span>${item.genre}</span></div>
+  </div>`;
+}
+function row(title,items,sub){
+  return `<div class="row"><div class="row-head"><h2>${title}</h2><span>${sub||''}</span></div>
+    <div class="row-track">${items.map((it,i)=>card(it,i)).join('')}</div></div>`;
+}
+function track(items){ return items.map((it,i)=>card(it,i)).join(''); }
+
+// Home rows
+document.getElementById('homeRows').innerHTML =
+  row("Continue Watching", MOVIES.slice(0,5)) +
+  row("Trending Now", SERIES.slice(0,6)) +
+  row("Popular Movies", MOVIES.slice(2,9)) +
+  row("Popular Series", SERIES.slice(1,7)) +
+  row("Recommended For You", MOVIES.slice(4,10)) +
+  row("Recently Added", SERIES.concat(MOVIES).slice(-8));
+
+document.getElementById('moviesRows').innerHTML =
+  row("Trending Movies", MOVIES.slice(0,6)) +
+  row("New Releases", MOVIES.slice(3,9)) +
+  row("Top Rated", MOVIES.slice(1,7)) +
+  row("Recommended", MOVIES.slice(5,11));
+
+document.getElementById('seriesRows').innerHTML =
+  row("Trending Series", SERIES.slice(0,6)) +
+  row("New Series", SERIES.slice(2,8)) +
+  row("Recently Added", SERIES.slice(1,7));
+
+document.getElementById('searchGrid').innerHTML = track(ALL);
+
+document.getElementById('profileContinue').innerHTML = track(MOVIES.slice(0,4));
+document.getElementById('profileWatchlist').innerHTML = track(SERIES.slice(0,4));
+document.getElementById('profileFav').innerHTML = track(MOVIES.slice(4,8));
+
+// Live TV
+const channels = ["Horizon News","Vertex Sports","CineMax One","KidsWave","Pulse Music","Comet Drama"];
+document.getElementById('channelRow').innerHTML = channels.map((c,i)=>`
+  <div class="chan-card glass"><div class="chan-logo">${c[0]}</div><div style="font-size:.82rem;font-weight:600">${c}</div>
+  <div style="font-size:.7rem;color:var(--muted2);margin:4px 0 10px">${["News","Sports","Movies","Kids","Entertainment","Entertainment"][i]}</div>
+  <button class="btn btn-glass" style="width:100%;justify-content:center;padding:8px;font-size:.78rem">Watch Live</button></div>`).join('');
+const epg = [["09:00 PM","Horizon News — 9 O'Clock Edition","Currently Playing"],["09:30 PM","Vertex Sports — Match Night","Upcoming"],["10:00 PM","CineMax One — Feature Film","Upcoming"],["10:30 PM","Pulse Music — Live Session","Upcoming"]];
+document.getElementById('epgList').innerHTML = epg.map(e=>`<div class="epg-item"><span class="time">${e[0]}</span><span style="flex:1">${e[1]}</span><span style="color:var(--muted2);font-size:.78rem">${e[2]}</span></div>`).join('');
+
+// ---------- View routing ----------
+let currentUser = "";
+function showView(name){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active', b.dataset.view===name));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
+
+document.getElementById('continueBtn').addEventListener('click', enterApp);
+document.getElementById('nameInput').addEventListener('keydown', e=>{ if(e.key==='Enter') enterApp(); });
+function enterApp(){
+  const val = document.getElementById('nameInput').value.trim();
+  currentUser = val || "Guest";
+  document.getElementById('mainNav').style.display='flex';
+  document.getElementById('bottomNav').style.display='flex';
+  document.getElementById('profileName').textContent = currentUser;
+  document.getElementById('bigAvatar').textContent = currentUser[0].toUpperCase();
+  document.querySelector('.avatar').textContent = currentUser[0].toUpperCase();
+  showView('home');
+}
+
+function openDetails(title){
+  const item = ALL.find(m=>m.title===title) || MOVIES[0];
+  document.getElementById('detailsTitle').textContent = item.title;
+  document.getElementById('detailsMeta').innerHTML = `<span class="pill">${item.type==='movie'?'Movie':'Series'}</span><span>${item.year}</span><span>${item.runtime}</span><span>${item.genre}</span><span>&#9733; ${item.rating}</span>`;
+  document.getElementById('detailsDesc').textContent = item.desc;
+  document.getElementById('detailsCast').textContent = item.cast;
+  document.getElementById('detailsDirector').textContent = item.director;
+  document.getElementById('detailsPoster').style.background = genArt(item.art);
+  document.getElementById('detailsPoster').querySelector('.glow') || (document.getElementById('detailsPoster').innerHTML='<div class="glow"></div>');
+  const seasonBlock = document.getElementById('seasonBlock');
+  if(item.type==='series'){
+    seasonBlock.style.display='block';
+    document.getElementById('epList').innerHTML = [1,2,3,4].map(n=>`
+      <div class="ep-item glass"><div><span class="n">EP ${n}</span><div style="font-weight:600;margin-top:2px">Episode ${n} — Chapter ${n}</div></div><button class="btn btn-glass" onclick="event.stopPropagation();showView('player')">&#9654; Play</button></div>`).join('');
+  } else { seasonBlock.style.display='none'; }
+  const related = ALL.filter(m=>m.title!==item.title).sort(()=>0.5-Math.random()).slice(0,7);
+  document.getElementById('relatedRow').innerHTML = track(related);
+  document.getElementById('playerTitle').textContent = item.title;
+  showView('details');
+}
+
+document.getElementById('searchInput').addEventListener('input', e=>{
+  const q = e.target.value.toLowerCase().trim();
+  const results = q ? ALL.filter(m=>m.title.toLowerCase().includes(q) || m.genre.toLowerCase().includes(q)) : ALL;
+  document.getElementById('searchGrid').innerHTML = track(results);
+  document.getElementById('searchGrid').style.display = results.length ? 'grid':'none';
+  document.getElementById('searchEmpty').style.display = results.length ? 'none':'block';
+});
+</script>
+</body>
+</html>
